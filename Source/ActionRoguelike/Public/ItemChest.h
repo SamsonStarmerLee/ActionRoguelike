@@ -1,0 +1,33 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "SGameplayInterface.h"
+#include "GameFramework/Actor.h"
+#include "ItemChest.generated.h"
+
+UCLASS()
+class ACTIONROGUELIKE_API AItemChest : public AActor, public ISGameplayInterface
+{
+	GENERATED_BODY()
+
+public:	
+
+	UPROPERTY(EditAnywhere)
+	float TargetPitch;
+	
+	void Interact_Implementation(APawn* InstigatorPawn) override;
+
+protected:
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* BodyMesh;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* LidMesh;
+
+public:
+	
+	AItemChest();
+};
