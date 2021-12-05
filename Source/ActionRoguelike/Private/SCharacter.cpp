@@ -44,9 +44,9 @@ void ASCharacter::MoveRight(float Value)
 	auto ControlRot = GetControlRotation();
 	ControlRot.Pitch = 0;
 	ControlRot.Roll = 0;
-
+	
 	const auto RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
-
+	
 	AddMovementInput(RightVector, Value);
 }
 
@@ -54,10 +54,10 @@ void ASCharacter::PrimaryAttack()
 {
 	const auto HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 	const FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
-
+	
 	auto SpawnParams = FActorSpawnParameters();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
+	
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 }
 
