@@ -2,10 +2,12 @@
 
 #include "SCharacter.h"
 
+#include "DrawDebugHelpers.h"
 #include "SInteractionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -62,14 +64,35 @@ void ASCharacter::PrimaryAttack()
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
-	const auto HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	const FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+	FVector  CameraLocation = CameraComp->GetComponentLocation();
+	FRotator CameraRotation = CameraComp->GetComponentRotation();
 	
+	FVector Start = CameraLocation;
+	FVector End   = Start + CameraRotation.Vector() * 3000.0f;
+	
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	
+	FHitResult Hit;
+	bool bBlockingHit = GetWorld()->LineTraceSingleByProfile(Hit, Start, End, "Projectile");
+	if (bBlockingHit)
+	{
+		End = Hit.Location;
+	}
+
+	const auto HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	const auto HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
+	const auto SpawnTM = FTransform(HandRotation, HandLocation);
+
 	auto SpawnParams = FActorSpawnParameters();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
 	
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+
+	// ---
+	const auto LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 2.0f);
 }
 
 void ASCharacter::PrimaryInteract()
