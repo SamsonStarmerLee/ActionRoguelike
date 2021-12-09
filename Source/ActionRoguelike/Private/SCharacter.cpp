@@ -111,6 +111,12 @@ void ASCharacter::SecondaryAttack()
 
 void ASCharacter::Teleport()
 {
+	PlayAnimMontage(AttackAnim);
+
+	TimerDelegate_Attack.Unbind();
+	TimerDelegate_Attack.BindUFunction(this, FName("FireProjectile"), TeleportProjectileClass);
+	
+	GetWorldTimerManager().SetTimer(TimerHandle_Attack, TimerDelegate_Attack, 0.2f, false);
 }
 
 void ASCharacter::PrimaryInteract()
@@ -121,13 +127,11 @@ void ASCharacter::PrimaryInteract()
 	}
 }
 
-// Called every frame
 void ASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
-// Called to bind functionality to input
 void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -142,4 +146,5 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ASCharacter::SecondaryAttack);
+	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &ASCharacter::Teleport);
 }
