@@ -56,13 +56,7 @@ void ASCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
-void ASCharacter::PrimaryAttack()
-{
-	PlayAnimMontage(AttackAnim);
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
-}
-
-void ASCharacter::PrimaryAttack_TimeElapsed()
+void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
 {
 	FVector  CameraLocation = CameraComp->GetComponentLocation();
 	FRotator CameraRotation = CameraComp->GetComponentRotation();
@@ -82,9 +76,9 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 
 	const auto HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 	const auto HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
-	const auto SpawnTM = FTransform(HandRotation, HandLocation);
+	FTransform SpawnTM = FTransform(HandRotation, HandLocation);
 
-	auto SpawnParams = FActorSpawnParameters();
+	FActorSpawnParameters SpawnParams = FActorSpawnParameters();
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
 	
@@ -93,6 +87,30 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 	// ---
 	const auto LineColor = bBlockingHit ? FColor::Green : FColor::Red;
 	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 2.0f);
+}
+
+void ASCharacter::PrimaryAttack()
+{
+	PlayAnimMontage(AttackAnim);
+
+	TimerDelegate_Attack.Unbind();
+	TimerDelegate_Attack.BindUFunction(this, FName("FireProjectile"), PrimaryAttackClass);
+	
+	GetWorldTimerManager().SetTimer(TimerHandle_Attack, TimerDelegate_Attack, 0.2f, false);
+}
+
+void ASCharacter::SecondaryAttack()
+{
+	PlayAnimMontage(AttackAnim);
+
+	TimerDelegate_Attack.Unbind();
+	TimerDelegate_Attack.BindUFunction(this, FName("FireProjectile"), SecondaryAttackClass);
+	
+	GetWorldTimerManager().SetTimer(TimerHandle_Attack, TimerDelegate_Attack, 0.2f, false);
+}
+
+void ASCharacter::Teleport()
+{
 }
 
 void ASCharacter::PrimaryInteract()
@@ -123,4 +141,5 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ASCharacter::SecondaryAttack);
 }

@@ -18,15 +18,19 @@ class ACTIONROGUELIKE_API ASCharacter : public ACharacter
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
+	TSubclassOf<AActor> PrimaryAttackClass;
 
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	TSubclassOf<AActor> SecondaryAttackClass;
+	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 
-	FTimerHandle TimerHandle_PrimaryAttack;
+	FTimerHandle TimerHandle_Attack;
+
+	FTimerDelegate TimerDelegate_Attack;
 
 public:
-	// Sets default values for this character's properties
 	ASCharacter();
 
 protected:
@@ -40,24 +44,30 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	USInteractionComponent* InteractionComponent;
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
 
+	UFUNCTION()
+	void FireProjectile(TSubclassOf<AActor> ProjectileClass);
+
+	UFUNCTION()
 	void PrimaryAttack();
 
-	void PrimaryAttack_TimeElapsed();
+	UFUNCTION()
+	void SecondaryAttack();
 
+	UFUNCTION()
+	void Teleport();
+
+	UFUNCTION()
 	void PrimaryInteract();
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };
