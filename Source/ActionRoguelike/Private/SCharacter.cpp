@@ -58,6 +58,8 @@ void ASCharacter::MoveRight(float Value)
 
 void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
 {
+	ensure(ProjectileClass);
+	
 	FVector  CameraLocation = CameraComp->GetComponentLocation();
 	FRotator CameraRotation = CameraComp->GetComponentRotation();
 	

@@ -19,10 +19,10 @@ protected:
 	FTimerHandle TimerHandle;
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* DepleteParticles;
+	UParticleSystem* DepleteEffect;
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* TeleportParticle;
+	UParticleSystem* TeleportEffect;
 
 public:
 

@@ -15,6 +15,9 @@ void ASTeleportProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ensure(DepleteEffect);
+	ensure(TeleportEffect);
+	
 	GetWorldTimerManager()
 		.SetTimer(TimerHandle, this, &ASTeleportProjectile::OnDeplete, 0.2f);
 
@@ -26,7 +29,7 @@ void ASTeleportProjectile::OnDeplete()
 	MovementComponent->StopMovementImmediately();
 
 	EffectComponent->Complete();
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DepleteParticles, GetActorLocation(), GetActorRotation());
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DepleteEffect, GetActorLocation(), GetActorRotation());
 	
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ASTeleportProjectile::OnTeleport, 0.2f);
 }
@@ -36,7 +39,7 @@ void ASTeleportProjectile::OnTeleport()
 	const auto Inst = GetInstigator();
 	Inst->SetActorLocation(GetActorLocation());
 
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TeleportParticle, GetActorLocation(), GetActorRotation());
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TeleportEffect, GetActorLocation(), GetActorRotation());
 	
 	Destroy();
 }
