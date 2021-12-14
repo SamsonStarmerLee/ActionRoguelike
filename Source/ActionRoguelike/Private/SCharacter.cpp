@@ -3,6 +3,7 @@
 #include "SCharacter.h"
 
 #include "DrawDebugHelpers.h"
+#include "SAttributeComponent.h"
 #include "SInteractionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -23,7 +24,8 @@ ASCharacter::ASCharacter()
 	CameraComp->SetupAttachment(SpringArm);
 
 	InteractionComponent = CreateDefaultSubobject<USInteractionComponent>("InteractionComponent");
-
+	AttributeComponent = CreateDefaultSubobject<USAttributeComponent>("AttributeComponent");
+	
 	bUseControllerRotationYaw = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -87,8 +89,8 @@ void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 
 	// ---
-	const auto LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 2.0f);
+	// const auto LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+	// DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 2.0f);
 }
 
 void ASCharacter::PrimaryAttack()
