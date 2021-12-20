@@ -27,6 +27,7 @@ void ASTeleportProjectile::BeginPlay()
 void ASTeleportProjectile::OnDeplete()
 {
 	MovementComponent->StopMovementImmediately();
+	SetActorEnableCollision(false);
 
 	EffectComponent->Complete();
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), DepleteEffect, GetActorLocation(), GetActorRotation());
@@ -37,8 +38,8 @@ void ASTeleportProjectile::OnDeplete()
 void ASTeleportProjectile::OnTeleport()
 {
 	const auto Inst = GetInstigator();
-	Inst->SetActorLocation(GetActorLocation());
-
+	Inst->TeleportTo(GetActorLocation(), Inst->GetActorRotation(), false, false);
+	
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TeleportEffect, GetActorLocation(), GetActorRotation());
 	
 	Destroy();

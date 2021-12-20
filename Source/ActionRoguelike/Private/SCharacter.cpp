@@ -11,6 +11,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
+
 ASCharacter::ASCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -31,7 +32,13 @@ ASCharacter::ASCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
-// Called when the game starts or when spawned
+void ASCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComponent->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
+}
+
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -60,37 +67,40 @@ void ASCharacter::MoveRight(float Value)
 
 void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
 {
-	ensure(ProjectileClass);
-	
-	FVector  CameraLocation = CameraComp->GetComponentLocation();
-	FRotator CameraRotation = CameraComp->GetComponentRotation();
-	
-	FVector Start = CameraLocation;
-	FVector End   = Start + CameraRotation.Vector() * 3000.0f;
-	
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	
-	FHitResult Hit;
-	bool bBlockingHit = GetWorld()->LineTraceSingleByProfile(Hit, Start, End, "Projectile");
-	if (bBlockingHit)
+	if (ensure(ProjectileClass))
 	{
-		End = Hit.Location;
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParameters.Instigator = this;
+
+		FCollisionShape Shape;
+		Shape.SetSphere(20.0f);
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
+
+		FCollisionObjectQueryParams ObjParams;
+		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+		
+		FVector TraceStart = CameraComp->GetComponentLocation();
+
+		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+
+		FHitResult Hit;
+		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
+		{
+			TraceEnd = Hit.ImpactPoint;
+		}
+
+		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
+
+		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
+		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParameters);
 	}
-
-	const auto HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	const auto HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
-	FTransform SpawnTM = FTransform(HandRotation, HandLocation);
-
-	FActorSpawnParameters SpawnParams = FActorSpawnParameters();
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-	
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
-
-	// ---
-	// const auto LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-	// DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 2.0f);
 }
 
 void ASCharacter::PrimaryAttack()
@@ -131,6 +141,15 @@ void ASCharacter::PrimaryInteract()
 	}
 }
 
+void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+	if (NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		const auto playerController = Cast<APlayerController>(GetController());
+		DisableInput(playerController);
+	}
+}
+
 void ASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -152,3 +171,36 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ASCharacter::SecondaryAttack);
 	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &ASCharacter::Teleport);
 }
+
+// Old LOS firing code
+// ensure(ProjectileClass);
+// 	
+// FVector  CameraLocation = CameraComp->GetComponentLocation();
+// FRotator CameraRotation = CameraComp->GetComponentRotation();
+// 	
+// FVector Start = CameraLocation;
+// FVector End   = Start + CameraRotation.Vector() * 3000.0f;
+// 	
+// FCollisionObjectQueryParams ObjectQueryParams;
+// ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+// 	
+// FHitResult Hit;
+// bool bBlockingHit = GetWorld()->LineTraceSingleByProfile(Hit, Start, End, "Projectile");
+// if (bBlockingHit)
+// {
+// 	End = Hit.Location;
+// }
+//
+// const auto HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+// const auto HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
+// FTransform SpawnTM = FTransform(HandRotation, HandLocation);
+//
+// FActorSpawnParameters SpawnParams = FActorSpawnParameters();
+// SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+// SpawnParams.Instigator = this;
+// 	
+// GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+//
+// // ---
+// // const auto LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+// // DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 2.0f);
