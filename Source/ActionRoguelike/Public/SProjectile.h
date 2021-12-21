@@ -28,15 +28,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UParticleSystemComponent* EffectComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UParticleSystem* ImpactVFX;
 
 	UFUNCTION()
-	void OnActorHit(UPrimitiveComponent* HitComponent,
+	virtual void OnActorHit(UPrimitiveComponent* HitComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
 		FVector NormalImpulse,
 		const FHitResult& Hit);
+
+	virtual void PostInitializeComponents() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Explode();

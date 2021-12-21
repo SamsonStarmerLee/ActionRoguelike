@@ -24,6 +24,13 @@ ASProjectile::ASProjectile()
 	MovementComponent->bInitialVelocityInLocalSpace = true;
 }
 
+void ASProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	SphereComponent->IgnoreActorWhenMoving(GetInstigator(), true);
+}
+
 void ASProjectile::OnActorHit(
 	UPrimitiveComponent* HitComponent,
 	AActor* OtherActor,
