@@ -31,6 +31,10 @@ void UBTS_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 						const bool bLineOfSight = MyController->LineOfSightTo(TargetActor);
 						BlackboardComp->SetValueAsBool("WithinAttackRange", bLineOfSight);
 					}
+					else
+					{
+						BlackboardComp->SetValueAsBool("WithinAttackRange", false);
+					}
 				}
 			}
 		}
