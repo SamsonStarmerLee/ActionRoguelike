@@ -29,6 +29,7 @@ EBTNodeResult::Type USBTTask_RangedAttack::ExecuteTask(UBehaviorTreeComponent& O
 
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParameters.Instigator = MyPawn;
 
 		AActor* NewProjectile = GetWorld()->SpawnActor(ProjectileClass, &MuzzleLocation, &MuzzleRotation, SpawnParameters);
 
