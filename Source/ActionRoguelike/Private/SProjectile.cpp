@@ -2,6 +2,7 @@
 
 #include "SProjectile.h"
 
+#include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -22,6 +23,9 @@ ASProjectile::ASProjectile()
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComponent");
 	MovementComponent->bRotationFollowsVelocity = true;
 	MovementComponent->bInitialVelocityInLocalSpace = true;
+
+	FlightAudioComponent = CreateDefaultSubobject<UAudioComponent>("FlightAudioComponent");
+	FlightAudioComponent->SetupAttachment(RootComponent);
 }
 
 void ASProjectile::PostInitializeComponents()
@@ -46,7 +50,12 @@ void ASProjectile::Explode_Implementation()
 	// Check to make sure we aren't already being 'destroyed'
 	if (ensure(!IsPendingKill()))
 	{
+		ensure(ImpactVFX);
+		ensure(ImpactSound);
+
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation(), GetActorRotation());
+	
 		Destroy();
 	}
 }
