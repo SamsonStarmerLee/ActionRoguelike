@@ -6,6 +6,7 @@
 #include "SAttributeComponent.h"
 #include "SInteractionComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/TimelineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -37,12 +38,6 @@ void ASCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AttributeComponent->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
-}
-
-void ASCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
 }
 
 void ASCharacter::MoveForward(float Value)
@@ -147,6 +142,11 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 	{
 		const auto playerController = Cast<APlayerController>(GetController());
 		DisableInput(playerController);
+	}
+
+	if (Delta < 0.f)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials("Time Of Hit Flash", GetWorld()->TimeSeconds);
 	}
 }
 

@@ -51,8 +51,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
 	USAttributeComponent* AttributeComponent;
 	
-	virtual void BeginPlay() override;
-
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
