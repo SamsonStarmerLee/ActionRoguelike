@@ -15,12 +15,14 @@ class ACTIONROGUELIKE_API ASMagicProjectile : public ASProjectile
 	GENERATED_BODY()
 
 protected:
-	virtual void OnActorHit(
-		UPrimitiveComponent* HitComponent,
+	UFUNCTION()
+	virtual void OnActorOverlap(
+		UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor,
 		UPrimitiveComponent* OtherComp,
-		FVector NormalImpulse,
-		const FHitResult& Hit) override;
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult & SweepResult);
 	
 public:
 	ASMagicProjectile();
