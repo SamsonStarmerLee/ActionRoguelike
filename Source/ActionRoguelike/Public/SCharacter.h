@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UParticleSystem* AttackEffect;
+	
 	FTimerHandle TimerHandle_Attack;
 
 	FTimerDelegate TimerDelegate_Attack;

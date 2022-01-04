@@ -4,6 +4,7 @@
 
 #include "SAttributeComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ASMagicProjectile::ASMagicProjectile() : Super()
 {
@@ -29,4 +30,11 @@ void ASMagicProjectile::OnActorOverlap(
 
 		Explode();
 	}
+}
+
+void ASMagicProjectile::Explode_Implementation()
+{
+	UGameplayStatics::PlayWorldCameraShake(this, CameraShake, GetActorLocation(), InnerShakeRadius, OuterShakeRadius);
+
+	Super::Explode_Implementation();
 }

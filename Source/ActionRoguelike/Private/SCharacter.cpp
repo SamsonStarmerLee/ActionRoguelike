@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -81,8 +82,7 @@ void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
 		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
 		
 		FVector TraceStart = CameraComp->GetComponentLocation();
-
-		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+		FVector TraceEnd   = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
 
 		FHitResult Hit;
 		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
@@ -94,6 +94,11 @@ void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
 
 		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
 		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParameters);
+
+		if (ensure(AttackEffect))
+		{
+			UGameplayStatics::SpawnEmitterAttached(AttackEffect, GetMesh(), "Muzzle_01");
+		}
 	}
 }
 
