@@ -30,8 +30,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 
-	UPROPERTY(EditAnywhere, Category = "Attack")
+	UPROPERTY(EditAnywhere, Category = "Effects")
 	UParticleSystem* AttackEffect;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName HandSocketName = "Muzzle_01";
 	
 	FTimerHandle TimerHandle_Attack;
 

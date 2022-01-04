@@ -28,6 +28,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float Heal;
 
+	UPROPERTY(EditAnywhere)
+	float RespawnCooldown = 10.f;
+
 public:	
 	ASHealthPotion();
 

@@ -26,17 +26,14 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	if (Attributes && !Attributes->IsFullHealth())
 	{
 		FTimerHandle RespawnTimer;
-		FTimerDelegate RespawnDelegate;
-		
-		RespawnDelegate.BindUFunction(this, FName("Respawn"));
-		GetWorldTimerManager().SetTimer(RespawnTimer, RespawnDelegate, 10.f, false);
-
-		// Disable while on cooldown
-		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		MeshComponent->SetVisibility(false);
+		GetWorldTimerManager().SetTimer(RespawnTimer, this, &ASHealthPotion::Respawn, RespawnCooldown);
 
 		// Heal!
 		Attributes->ApplyHealthChange(Heal);
+
+		// Disable while on cooldown
+		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		RootComponent->SetVisibility(false, true);
 	}
 }
 
@@ -49,5 +46,5 @@ void ASHealthPotion::BeginPlay()
 void ASHealthPotion::Respawn()
 {
 	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	MeshComponent->SetVisibility(true);
+	RootComponent->SetVisibility(true, true);
 }

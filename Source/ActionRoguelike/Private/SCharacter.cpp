@@ -9,7 +9,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 
@@ -64,7 +63,7 @@ void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
 {
 	if (ensure(ProjectileClass))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
 
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -97,7 +96,7 @@ void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
 
 		if (ensure(AttackEffect))
 		{
-			UGameplayStatics::SpawnEmitterAttached(AttackEffect, GetMesh(), "Muzzle_01");
+			UGameplayStatics::SpawnEmitterAttached(AttackEffect, GetMesh(), HandSocketName);
 		}
 	}
 }
