@@ -33,6 +33,9 @@ protected:
 	
 public:
 
+	UFUNCTION()
+	bool IsFullHealth() const;
+
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
 
