@@ -30,3 +30,23 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delt
 	
 	return TrueDelta != 0;
 }
+
+USAttributeComponent* USAttributeComponent::GetAttributes(AActor* FromActor)
+{
+	if (FromActor)
+	{
+		return FromActor->FindComponentByClass<USAttributeComponent>();
+	}
+
+	return nullptr;
+}
+
+bool USAttributeComponent::IsActorAlive(AActor* Actor)
+{
+	if (const auto AttributeComp = GetAttributes(Actor))
+	{
+		return AttributeComp->IsAlive();
+	}
+
+	return false;
+}
