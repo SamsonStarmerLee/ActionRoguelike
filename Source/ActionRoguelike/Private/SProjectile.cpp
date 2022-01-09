@@ -13,7 +13,6 @@ ASProjectile::ASProjectile()
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
 	SphereComponent->SetCollisionProfileName("Projectile");
-	SphereComponent->OnComponentHit.AddDynamic(this, &ASProjectile::OnActorHit);
 	RootComponent = SphereComponent;
 
 	EffectComponent = CreateDefaultSubobject<UParticleSystemComponent>("EffectComponent");
@@ -32,6 +31,7 @@ void ASProjectile::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	SphereComponent->IgnoreActorWhenMoving(GetInstigator(), true);
+	SphereComponent->OnComponentHit.AddDynamic(this, &ASProjectile::OnActorHit);
 }
 
 void ASProjectile::OnActorHit(

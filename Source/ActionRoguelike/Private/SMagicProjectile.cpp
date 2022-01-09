@@ -25,10 +25,9 @@ void ASMagicProjectile::OnActorOverlap(
 			Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComponent)
 		{
-			AttributeComponent->ApplyHealthChange(-20.0f);
+			AttributeComponent->ApplyHealthChange(-Damage);
+			Explode();
 		}
-
-		Explode();
 	}
 }
 

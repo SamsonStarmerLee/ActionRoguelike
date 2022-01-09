@@ -24,6 +24,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera Shake")
 	float OuterShakeRadius = 1000.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Damage = 20.f;
 	
 	UFUNCTION()
 	virtual void OnActorOverlap(
