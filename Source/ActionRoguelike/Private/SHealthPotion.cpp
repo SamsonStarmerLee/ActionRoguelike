@@ -29,7 +29,7 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		GetWorldTimerManager().SetTimer(RespawnTimer, this, &ASHealthPotion::Respawn, RespawnCooldown);
 
 		// Heal!
-		Attributes->ApplyHealthChange(Heal);
+		Attributes->ApplyHealthChange(this, Heal);
 
 		// Disable while on cooldown
 		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);

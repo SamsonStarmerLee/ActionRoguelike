@@ -19,14 +19,14 @@ bool USAttributeComponent::IsAlive() const
 	return Health > 0;
 }
 
-bool USAttributeComponent::ApplyHealthChange(float Delta)
+bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
 	const float OldHealth = Health;
 
 	Health = FMath::Clamp(Health + Delta, 0.f, MaxHealth);
 
 	const float TrueDelta = Health - OldHealth;
-	OnHealthChanged.Broadcast(nullptr, this, Health, TrueDelta);
+	OnHealthChanged.Broadcast(InstigatorActor, this, Health, TrueDelta);
 	
 	return TrueDelta != 0;
 }

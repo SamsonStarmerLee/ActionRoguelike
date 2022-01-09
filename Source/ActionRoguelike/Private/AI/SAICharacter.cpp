@@ -24,10 +24,26 @@ void ASAICharacter::PostInitializeComponents()
 	AttributeComponent->OnHealthChanged.AddDynamic(this, &ASAICharacter::OnHealthChanged);
 }
 
+void ASAICharacter::SetTargetActor(AActor* NewTarget) const
+{
+	const auto AiController = Cast<AAIController>(GetController());
+	if (AiController)
+	{
+		AiController->
+			GetBlackboardComponent()->
+			SetValueAsObject("TargetActor", NewTarget);
+	}
+}
+
 void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
 	if (Delta < 0.0f)
 	{
+		if (InstigatorActor != this)
+		{
+			SetTargetActor(InstigatorActor);
+		}
+		
 		if (NewHealth <= 0.0f)
 		{
 			// Stop BT
@@ -49,12 +65,7 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	const auto AiController = Cast<AAIController>(GetController());
-	if (AiController)
-	{
-		const auto BBComp = AiController->GetBlackboardComponent();
-		BBComp->SetValueAsObject("TargetActor", Pawn);
-
-		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::Red, 4.0f, true);
-	}
+	SetTargetActor(Pawn);
+	
+	//DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::Red, 4.0f, true);
 }

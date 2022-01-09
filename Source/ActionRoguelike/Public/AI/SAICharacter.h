@@ -19,13 +19,15 @@ public:
 
 protected:
 
+	virtual void PostInitializeComponents() override;
+
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
 	USAttributeComponent* AttributeComponent;
 
-	virtual void PostInitializeComponents() override;
+	void SetTargetActor(AActor* NewTarget) const;
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
