@@ -10,6 +10,8 @@
 
 ASAICharacter::ASAICharacter()
 {
+	TimeToHitParamName = "TimeOfHit";
+	
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
@@ -43,6 +45,9 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 		{
 			SetTargetActor(InstigatorActor);
 		}
+
+		// Hit flash
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
 		
 		if (NewHealth <= 0.0f)
 		{

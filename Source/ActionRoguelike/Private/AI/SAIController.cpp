@@ -11,14 +11,14 @@ void ASAIController::BeginPlay()
 	{
 		RunBehaviorTree(BehaviorTree);
 	}
-
-	// const auto PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	// if (PlayerPawn)
-	// {
-	// 	GetBlackboardComponent()->
-	// 		SetValueAsVector("MoveToLocation", PlayerPawn->GetActorLocation());
-	//
-	// 	GetBlackboardComponent()->
-	// 		SetValueAsObject("TargetActor", PlayerPawn);
-	// }
 }
+
+// const auto PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+// if (PlayerPawn)
+// {
+// 	GetBlackboardComponent()->
+// 		SetValueAsVector("MoveToLocation", PlayerPawn->GetActorLocation());
+//
+// 	GetBlackboardComponent()->
+// 		SetValueAsObject("TargetActor", PlayerPawn);
+// }
