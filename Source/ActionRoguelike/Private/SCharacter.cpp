@@ -177,6 +177,11 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &ASCharacter::Teleport);
 }
 
+void ASCharacter::HealSelf(const float Amount /* 100 */)
+{
+	AttributeComponent->ApplyHealthChange(this, Amount);
+}
+
 // Old LOS firing code
 // ensure(ProjectileClass);
 // 	
