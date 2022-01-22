@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
+class USActionComponent;
 class USAttributeComponent;
 class USInteractionComponent;
 class UCameraComponent;
@@ -59,11 +60,18 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
 	USAttributeComponent* AttributeComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Actions")
+	USActionComponent* ActionComponent;
 	
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
 
+	void SprintStart();
+
+	void SprintStop();
+	
 	UFUNCTION()
 	void FireProjectile(TSubclassOf<AActor> ProjectileClass);
 

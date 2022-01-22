@@ -3,6 +3,7 @@
 #include "SCharacter.h"
 
 #include "DrawDebugHelpers.h"
+#include "SActionComponent.h"
 #include "SAttributeComponent.h"
 #include "SInteractionComponent.h"
 #include "Camera/CameraComponent.h"
@@ -28,6 +29,7 @@ ASCharacter::ASCharacter()
 
 	InteractionComponent = CreateDefaultSubobject<USInteractionComponent>("InteractionComponent");
 	AttributeComponent = CreateDefaultSubobject<USAttributeComponent>("AttributeComponent");
+	ActionComponent = CreateDefaultSubobject<USActionComponent>("ActionComponent");
 	
 	bUseControllerRotationYaw = false;
 
@@ -64,6 +66,16 @@ void ASCharacter::MoveRight(float Value)
 	const auto RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
 	
 	AddMovementInput(RightVector, Value);
+}
+
+void ASCharacter::SprintStart()
+{
+	ActionComponent->StartActionByName(this, "Sprint");
+}
+
+void ASCharacter::SprintStop()
+{
+	ActionComponent->StopActionByName(this, "Sprint");
 }
 
 void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
@@ -175,6 +187,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASCharacter::SprintStop);
+
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
@@ -186,36 +201,3 @@ void ASCharacter::HealSelf(const float Amount /* 100 */)
 {
 	AttributeComponent->ApplyHealthChange(this, Amount);
 }
-
-// Old LOS firing code
-// ensure(ProjectileClass);
-// 	
-// FVector  CameraLocation = CameraComp->GetComponentLocation();
-// FRotator CameraRotation = CameraComp->GetComponentRotation();
-// 	
-// FVector Start = CameraLocation;
-// FVector End   = Start + CameraRotation.Vector() * 3000.0f;
-// 	
-// FCollisionObjectQueryParams ObjectQueryParams;
-// ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-// 	
-// FHitResult Hit;
-// bool bBlockingHit = GetWorld()->LineTraceSingleByProfile(Hit, Start, End, "Projectile");
-// if (bBlockingHit)
-// {
-// 	End = Hit.Location;
-// }
-//
-// const auto HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-// const auto HandRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
-// FTransform SpawnTM = FTransform(HandRotation, HandLocation);
-//
-// FActorSpawnParameters SpawnParams = FActorSpawnParameters();
-// SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-// SpawnParams.Instigator = this;
-// 	
-// GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
-//
-// // ---
-// // const auto LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-// // DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 2.0f);
