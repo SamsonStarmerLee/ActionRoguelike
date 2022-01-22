@@ -15,16 +15,5 @@ class ACTIONROGUELIKE_API USInteractionComponent : public UActorComponent
 public:
 	void PrimaryInteract() const;
 	
-	// Sets default values for this component's properties
 	USInteractionComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
 };
