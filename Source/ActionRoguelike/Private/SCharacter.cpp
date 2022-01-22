@@ -41,6 +41,11 @@ void ASCharacter::PostInitializeComponents()
 	AttributeComponent->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
 
+FVector ASCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
+}
+
 void ASCharacter::MoveForward(float Value)
 {
 	auto ControlRot = GetControlRotation();

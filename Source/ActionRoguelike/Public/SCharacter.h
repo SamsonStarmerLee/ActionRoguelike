@@ -84,6 +84,8 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
+	virtual FVector GetPawnViewLocation() const override;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
