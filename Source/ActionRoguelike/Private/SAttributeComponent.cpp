@@ -3,6 +3,8 @@
 
 #include "SAttributeComponent.h"
 
+#include "SGameModeBase.h"
+
 USAttributeComponent::USAttributeComponent()
 {
 	MaxHealth = 100;
@@ -42,6 +44,15 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delt
 
 	const float TrueDelta = Health - OldHealth;
 	OnHealthChanged.Broadcast(InstigatorActor, this, Health, TrueDelta);
+
+	if (TrueDelta < 0 && Health == 0.f)
+	{
+		ASGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ASGameModeBase>();
+		if (GameMode)
+		{
+			GameMode->OnActorKilled(GetOwner(), InstigatorActor);
+		}
+	}
 	
 	return TrueDelta != 0;
 }
