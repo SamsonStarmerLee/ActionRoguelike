@@ -24,7 +24,8 @@ bool USGameplayFunctionLibrary::ApplyDirectionalDamage(AActor* DamageCauser, AAc
 		const auto HitComponent = HitResult.GetComponent();
 		if (HitComponent && HitComponent->IsSimulatingPhysics(HitResult.BoneName))
 		{
-			HitComponent->AddImpulseAtLocation(-HitResult.ImpactNormal * 30000.f, HitResult.ImpactPoint, HitResult.BoneName);
+			const FVector Direction = (HitResult.TraceEnd - HitResult.TraceStart).GetSafeNormal();
+			HitComponent->AddImpulseAtLocation(Direction * 300000.f, HitResult.ImpactPoint, HitResult.BoneName);
 		}
 
 		return true;
