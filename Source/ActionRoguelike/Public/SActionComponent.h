@@ -16,6 +16,8 @@ class ACTIONROGUELIKE_API USActionComponent : public UActorComponent
 public:	
 	USActionComponent();
 
+	virtual void BeginPlay() override;
+
 	UFUNCTION(BlueprintCallable, Category = "Actions")
 	void AddAction(TSubclassOf<USAction> ActionClass);
 
@@ -26,6 +28,9 @@ public:
 	bool StopActionByName(AActor* Instigator, FName ActionName);
 	
 protected:
+
+	UPROPERTY(EditAnywhere, Category = "Actions")
+	TArray<TSubclassOf<USAction>> DefaultActions;
 
 	UPROPERTY()
 	TArray<USAction*> Actions;

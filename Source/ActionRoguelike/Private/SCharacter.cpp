@@ -15,7 +15,6 @@
 
 ASCharacter::ASCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	TimeToHitParamName = "TimeOfHit";
@@ -78,76 +77,19 @@ void ASCharacter::SprintStop()
 	ActionComponent->StopActionByName(this, "Sprint");
 }
 
-void ASCharacter::FireProjectile(TSubclassOf<AActor> ProjectileClass)
-{
-	if (ensure(ProjectileClass))
-	{
-		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
-
-		FActorSpawnParameters SpawnParameters;
-		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParameters.Instigator = this;
-
-		FCollisionShape Shape;
-		Shape.SetSphere(20.0f);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-
-		FCollisionObjectQueryParams ObjParams;
-		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
-		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
-		
-		FVector TraceStart = CameraComp->GetComponentLocation();
-		FVector TraceEnd   = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
-
-		FHitResult Hit;
-		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
-		{
-			TraceEnd = Hit.ImpactPoint;
-		}
-
-		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
-
-		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
-		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParameters);
-
-		if (ensure(AttackEffect))
-		{
-			UGameplayStatics::SpawnEmitterAttached(AttackEffect, GetMesh(), HandSocketName);
-		}
-	}
-}
-
 void ASCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
-
-	TimerDelegate_Attack.Unbind();
-	TimerDelegate_Attack.BindUFunction(this, FName("FireProjectile"), PrimaryAttackClass);
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_Attack, TimerDelegate_Attack, 0.2f, false);
+	ActionComponent->StartActionByName(this, "PrimaryAttack");
 }
 
 void ASCharacter::SecondaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
-
-	TimerDelegate_Attack.Unbind();
-	TimerDelegate_Attack.BindUFunction(this, FName("FireProjectile"), SecondaryAttackClass);
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_Attack, TimerDelegate_Attack, 0.2f, false);
+	ActionComponent->StartActionByName(this, "SecondaryAttack");
 }
 
 void ASCharacter::Teleport()
 {
-	PlayAnimMontage(AttackAnim);
-
-	TimerDelegate_Attack.Unbind();
-	TimerDelegate_Attack.BindUFunction(this, FName("FireProjectile"), TeleportProjectileClass);
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_Attack, TimerDelegate_Attack, 0.2f, false);
+	ActionComponent->StartActionByName(this, "Teleport");
 }
 
 void ASCharacter::PrimaryInteract()
@@ -190,9 +132,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASCharacter::SprintStart);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASCharacter::SprintStop);
 
-	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ASCharacter::SecondaryAttack);
 	PlayerInputComponent->BindAction("Teleport", IE_Pressed, this, &ASCharacter::Teleport);
 }

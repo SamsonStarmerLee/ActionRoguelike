@@ -11,3 +11,15 @@ void USAction::StopAction_Implementation(AActor* Instigator)
 {
 	UE_LOG(LogTemp, Log, TEXT("Stopped: %s"), *GetNameSafe(this));
 }
+
+UWorld* USAction::GetWorld() const
+{
+	// Outer is set when creating action via NewObject<>
+	const auto OuterActor = Cast<UActorComponent>(GetOuter());
+	if (OuterActor)
+	{
+		return OuterActor->GetWorld();
+	}
+
+	return nullptr;
+}

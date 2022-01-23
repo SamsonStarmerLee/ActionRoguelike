@@ -17,30 +17,6 @@ class ACTIONROGUELIKE_API ASCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-protected:
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> PrimaryAttackClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> SecondaryAttackClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> TeleportProjectileClass;
-	
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UAnimMontage* AttackAnim;
-
-	UPROPERTY(EditAnywhere, Category = "Effects")
-	UParticleSystem* AttackEffect;
-
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
-	FName HandSocketName = "Muzzle_01";
-	
-	FTimerHandle TimerHandle_Attack;
-
-	FTimerDelegate TimerDelegate_Attack;
-
 public:
 	ASCharacter();
 
@@ -71,9 +47,6 @@ protected:
 	void SprintStart();
 
 	void SprintStop();
-	
-	UFUNCTION()
-	void FireProjectile(TSubclassOf<AActor> ProjectileClass);
 
 	UFUNCTION()
 	void PrimaryAttack();

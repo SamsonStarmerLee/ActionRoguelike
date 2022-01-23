@@ -7,6 +7,16 @@ USActionComponent::USActionComponent()
 {
 }
 
+void USActionComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	for (const auto ActionClass : DefaultActions)
+	{
+		AddAction(ActionClass);
+	}
+}
+
 void USActionComponent::AddAction(TSubclassOf<USAction> ActionClass)
 {
 	if (!ensure(ActionClass))
