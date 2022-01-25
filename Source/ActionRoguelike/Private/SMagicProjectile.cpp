@@ -2,9 +2,11 @@
 
 #include "SMagicProjectile.h"
 
+#include "SActionComponent.h"
 #include "SAttributeComponent.h"
 #include "SGameplayFunctionLibrary.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 ASMagicProjectile::ASMagicProjectile() : Super()
@@ -22,6 +24,16 @@ void ASMagicProjectile::OnActorOverlap(
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
+		const auto ActionComponent = OtherActor->FindComponentByClass<USActionComponent>();
+		if (ActionComponent && ActionComponent->ActiveGameplayTags.HasTag(ParryTag))
+		{
+			// Invert velocity for getting 'batted back' when parried
+			MovementComponent->Velocity = -MovementComponent->Velocity;
+
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
+
 		if (USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, Damage, SweepResult))
 		{
 			Explode();
