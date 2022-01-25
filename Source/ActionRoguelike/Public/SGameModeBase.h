@@ -36,15 +36,30 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UCurveFloat* DifficultyCurve;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Coins")
+	UEnvQuery* SpawnCoinsQuery;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Coins")
+	int32 DesiredCoinCount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Coins")
+	TSubclassOf<AActor> CoinClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Coins")
+	float RequiredPowerupSeparation;
+
 	UFUNCTION()
 	void SPawnBotTimerElapsed();
 	
 	UFUNCTION()
-	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	void OnSpawnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);
+
+	UFUNCTION()
+	void OnSpawnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 	
 public:
 	

@@ -3,42 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SGameplayInterface.h"
-#include "GameFramework/Actor.h"
+#include "SPickupActor.h"
 #include "SHealthPotion.generated.h"
 
 class UCapsuleComponent;
 
 UCLASS()
-class ACTIONROGUELIKE_API ASHealthPotion : public AActor, public ISGameplayInterface
+class ACTIONROGUELIKE_API ASHealthPotion final : public ASPickupActor
 {
 	GENERATED_BODY()
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USceneComponent* SceneComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UCapsuleComponent* CapsuleComponent;
+	UPROPERTY(EditAnywhere)
+	int32 Cost;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UMeshComponent* MeshComponent;
-
 	UPROPERTY(EditAnywhere)
 	float Heal;
 
 	UPROPERTY(EditAnywhere)
 	float RespawnCooldown = 10.f;
 
-public:	
-	ASHealthPotion();
-
-protected:
-	virtual void BeginPlay() override;
-
 	UFUNCTION()
-	void Respawn();
+	void Respawn() const;
 
 public:	
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
