@@ -37,6 +37,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Credits")
 	bool RemoveCredits(int32 Amount);
 
-	UPROPERTY(BlueprintCallable, Category = "Credits")
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Credits")
 	FOnCreditsChanged OnCreditsChanged;
 };
