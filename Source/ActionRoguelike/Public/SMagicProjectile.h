@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "SActionEffect.h"
 #include "SProjectile.h"
 #include "SMagicProjectile.generated.h"
 
@@ -31,6 +32,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	FGameplayTag ParryTag;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TSubclassOf<USActionEffect> BurningEffectClass;
 	
 	UFUNCTION()
 	virtual void OnActorOverlap(
