@@ -37,7 +37,10 @@ protected:
 	TEnumAsByte<ECollisionChannel> TraceChannel;
 	
 public:
-	void PrimaryInteract() const;
+	void PrimaryInteract();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AActor* InFocus);
 	
 	USInteractionComponent();
 };

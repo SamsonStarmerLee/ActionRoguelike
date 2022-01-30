@@ -1,9 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ItemChest.h"
-
-// Sets default values
+#include "Net/UnrealNetwork.h"
 
 AItemChest::AItemChest()
 {
@@ -17,9 +15,25 @@ AItemChest::AItemChest()
 	LidMesh->SetupAttachment(RootComponent);
 
 	TargetPitch = 110;
+
+	SetReplicates(true);
 }
 
 void AItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
-	LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0 ,0));
+	bLidOpened = !bLidOpened;
+	OnRep_LidOpened(); // Manually call for server (if desired. rep_notifies don't auto-trigger serverside.)
+}
+
+void AItemChest::OnRep_LidOpened()
+{
+	const float CurrentPitch = bLidOpened ? TargetPitch : 0;
+	LidMesh->SetRelativeRotation(FRotator(CurrentPitch, 0 ,0));
+}
+
+void AItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AItemChest, bLidOpened);
 }
