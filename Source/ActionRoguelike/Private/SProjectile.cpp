@@ -24,6 +24,8 @@ ASProjectile::ASProjectile()
 
 	FlightAudioComponent = CreateDefaultSubobject<UAudioComponent>("FlightAudioComponent");
 	FlightAudioComponent->SetupAttachment(RootComponent);
+
+	// SetReplicates(true);
 }
 
 void ASProjectile::PostInitializeComponents()
@@ -49,11 +51,15 @@ void ASProjectile::Explode_Implementation()
 	// Check to make sure we aren't already being 'destroyed'
 	if (ensure(!IsPendingKill()))
 	{
-		ensure(ImpactVFX);
-		ensure(ImpactSound);
+		if (ImpactVFX)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+		}
 
-		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation(), GetActorRotation());
+		if (ImpactSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSound, GetActorLocation(), GetActorRotation());
+		}
 	
 		Destroy();
 	}

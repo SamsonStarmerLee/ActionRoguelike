@@ -14,6 +14,8 @@ ASPickupActor::ASPickupActor()
 	
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	MeshComponent->SetupAttachment(RootComponent);
+
+	SetReplicates(true);
 }
 
 void ASPickupActor::Interact_Implementation(APawn* InstigatorPawn)

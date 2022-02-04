@@ -16,10 +16,10 @@ public:
 	AExplosiveBarrel();
 
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	URadialForceComponent* RadialForceComponent;
 
 	virtual void PostInitializeComponents() override;
