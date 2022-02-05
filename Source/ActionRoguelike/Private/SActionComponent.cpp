@@ -3,6 +3,8 @@
 #include "SActionComponent.h"
 #include "SAction.h"
 #include "ActionRoguelike/ActionRoguelike.h"
+#include "Engine/ActorChannel.h"
+#include "Net/UnrealNetwork.h"
 
 USActionComponent::USActionComponent()
 {
@@ -41,10 +43,25 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	           *GetNameSafe(GetOwner()),
 	           *Action->ActionName.ToString(),
 	           Action->IsRunning() ? TEXT("true") : TEXT("false"),
-	           *GetNameSafe(GetOuter()));
+	           *GetNameSafe(Action->GetOuter()));
 
 		LogOnScreen(this, ActionMsg, TextColor, 0.f);
 	}
+}
+
+bool USActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+	for (USAction* Action : Actions)
+	{
+		// Loop through action UObjects looking for changes to report
+		if (Action)
+		{
+			WroteSomething |= Channel->ReplicateSubobject(Action, *Bunch, *RepFlags);
+		}
+	}
+
+	return WroteSomething;
 }
 
 void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)
@@ -54,9 +71,10 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 		return;
 	}
 
-	USAction* NewAction = NewObject<USAction>(this, ActionClass);
+	USAction* NewAction = NewObject<USAction>(GetOwner(), ActionClass);
 	if (ensure(NewAction))
 	{
+		NewAction->Initialize(this);
 		Actions.Add(NewAction);
 
 		if (NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)))
@@ -136,4 +154,11 @@ bool USActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 void USActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
 {
 	StartActionByName(Instigator, ActionName);
+}
+
+void USActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USActionComponent, Actions);
 }
