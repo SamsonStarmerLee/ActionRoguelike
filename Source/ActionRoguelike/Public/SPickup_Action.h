@@ -4,23 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "SPickupActor.h"
-#include "SHealthPotion.generated.h"
+#include "SPickup_Action.generated.h"
 
-class UCapsuleComponent;
-
+class USAction;
+/**
+ * 
+ */
 UCLASS()
-class ACTIONROGUELIKE_API ASHealthPotion final : public ASPickupActor
+class ACTIONROGUELIKE_API ASPickup_Action : public ASPickupActor
 {
 	GENERATED_BODY()
-
-protected:
 	
-	UPROPERTY(EditAnywhere)
-	int32 Cost;
-	
-	UPROPERTY(EditAnywhere)
-	float Heal;
+public:
 
-public:	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<USAction> ActionToGrant;
+	
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 };

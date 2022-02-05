@@ -28,6 +28,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UMeshComponent* MeshComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float RespawnTime;
+
+	FTimerHandle TimerHandle_RespawnTimer;
+
+	UFUNCTION()
+	void HideAndStartCooldown();
+
+	UFUNCTION()
+	void Respawn() const;
+
 public:
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 	

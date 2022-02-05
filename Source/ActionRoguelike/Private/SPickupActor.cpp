@@ -18,6 +18,20 @@ ASPickupActor::ASPickupActor()
 	SetReplicates(true);
 }
 
+void ASPickupActor::HideAndStartCooldown()
+{
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	RootComponent->SetVisibility(false, true);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASPickupActor::Respawn, RespawnTime);
+}
+
+void ASPickupActor::Respawn() const
+{
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	RootComponent->SetVisibility(true, true);
+}
+
 void ASPickupActor::Interact_Implementation(APawn* InstigatorPawn)
 {
 	// Implement in derived classes

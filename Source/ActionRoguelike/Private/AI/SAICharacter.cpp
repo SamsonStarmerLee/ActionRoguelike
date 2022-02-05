@@ -92,9 +92,29 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 	}
 }
 
+AActor* ASAICharacter::GetTargetActor() const
+{
+	const auto AIController = Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		return Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject(TargetActorKey));
+	}
+
+	return nullptr;
+}
+
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	SetTargetActor(Pawn);
-	
-	//DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::Red, 4.0f, true);
+	// Ignore if target already set to this
+	if (GetTargetActor() != Pawn)
+	{
+		SetTargetActor(Pawn);
+
+		const auto Widget = CreateWidget<USWorldUserWidget>(GetWorld(), SpottedWidgetClass);
+		if (Widget)
+		{
+			Widget->AttachedActor = Pawn;
+			Widget->AddToViewport(10); // High index ensures placement over other widgets like healthbars.
+		}
+	}
 }

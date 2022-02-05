@@ -4,7 +4,6 @@
 #include "SAttributeComponent.h"
 #include "SCharacter.h"
 #include "SPlayerState.h"
-#include "Components/CapsuleComponent.h"
 
 void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
@@ -40,19 +39,9 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	// Pay for heal
 	PlayerState->RemoveCredits(Cost);
 	
-	FTimerHandle RespawnTimer;
-	GetWorldTimerManager().SetTimer(RespawnTimer, this, &ASHealthPotion::Respawn, RespawnCooldown);
-
 	// Heal!
 	Attributes->ApplyHealthChange(this, Heal);
 
-	// Disable while on cooldown
-	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	RootComponent->SetVisibility(false, true);
-}
-
-void ASHealthPotion::Respawn() const
-{
-	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	RootComponent->SetVisibility(true, true);
+	// Go on cooldown
+	HideAndStartCooldown();
 }
