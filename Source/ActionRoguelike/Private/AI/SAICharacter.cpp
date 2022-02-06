@@ -106,7 +106,7 @@ AActor* ASAICharacter::GetTargetActor() const
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
 	// Ignore if target already set to this
-	if (GetTargetActor() != Pawn)
+	if (GetTargetActor() != Pawn && SpottedWidgetClass)
 	{
 		SetTargetActor(Pawn);
 
