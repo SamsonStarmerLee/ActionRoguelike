@@ -38,3 +38,19 @@ bool ASPlayerState::RemoveCredits(const int32 Amount)
 
 	return true;
 }
+
+void ASPlayerState::SavePlayerState_Implementation(USSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		SaveObject->Credits = Credits;
+	}
+}
+
+void ASPlayerState::LoadPlayerState_Implementation(USSaveGame* SaveObject)
+{
+	if (SaveObject)
+	{
+		Credits = SaveObject->Credits;
+	}
+}

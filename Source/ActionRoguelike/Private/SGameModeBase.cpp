@@ -10,12 +10,22 @@
 #include "AI/SAICharacter.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
+#include "GameFramework/GameStateBase.h"
+#include "GameFramework/SaveGame.h"
+#include "Kismet/GameplayStatics.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable spawning of bots via timer."), ECVF_Cheat);
 
 ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
+}
+
+void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	LoadSaveGame();
 }
 
 void ASGameModeBase::StartPlay()
@@ -169,6 +179,17 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
 }
 
+void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	ASPlayerState* State = NewPlayer->GetPlayerState<ASPlayerState>();
+	if (State)
+	{
+		State->LoadPlayerState(CurrentSaveGame);
+	}
+}
+
 void ASGameModeBase::KillAll()
 {
 	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It)
@@ -180,5 +201,38 @@ void ASGameModeBase::KillAll()
 		{
 			AttributeComponent->Kill(this); // TODO: Pass in player? for kill credit
 		}
+	}
+}
+
+void ASGameModeBase::WriteSaveGame()
+{
+	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		ASPlayerState* State = Cast<ASPlayerState>(GameState->PlayerArray[i]);
+		if (State)
+		{
+			State->SavePlayerState(CurrentSaveGame);
+		}
+	}
+	
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+}
+
+void ASGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+	  	CurrentSaveGame = Cast<USSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		if (CurrentSaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame data."));
+			return;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Loaded SaveGame data."));
+	}
+	else
+	{
+		CurrentSaveGame = Cast<USSaveGame>(UGameplayStatics::CreateSaveGameObject(USSaveGame::StaticClass()));
 	}
 }

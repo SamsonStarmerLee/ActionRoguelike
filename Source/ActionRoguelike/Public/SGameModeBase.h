@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SSaveGame.h"
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "GameFramework/GameModeBase.h"
 #include "SGameModeBase.generated.h"
@@ -23,8 +24,13 @@ public:
 
 protected:
 
+	FString SlotName = "SaveGame01";
+
 	FTimerHandle TimerHandle_SpawnBots;
 
+	UPROPERTY()
+	USSaveGame* CurrentSaveGame;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UEnvQuery* SpawnBotQuery;
 	
@@ -62,9 +68,18 @@ protected:
 	void OnSpawnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 	
 public:
+
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	
 	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
 
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
 	UFUNCTION(Exec)
 	void KillAll();
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void WriteSaveGame();
+
+	void LoadSaveGame();
 };
