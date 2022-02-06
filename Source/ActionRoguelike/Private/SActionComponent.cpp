@@ -39,11 +39,7 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		const auto TextColor = Action->IsRunning() ? FColor::Red : FColor::White;
 
 		const auto ActionMsg =
-			FString::Printf(TEXT("[%s] Action: %s : IsRunning: %s : Outer: %s"),
-	           *GetNameSafe(GetOwner()),
-	           *Action->ActionName.ToString(),
-	           Action->IsRunning() ? TEXT("true") : TEXT("false"),
-	           *GetNameSafe(Action->GetOuter()));
+			FString::Printf(TEXT("[%s] Action: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Action));
 
 		LogOnScreen(this, ActionMsg, TextColor, 0.f);
 	}
@@ -68,6 +64,16 @@ void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> Acti
 {
 	if (!ensure(ActionClass))
 	{
+		return;
+	}
+
+	// Skip for Clients
+	if (!GetOwner()->HasAuthority())
+	{
+		UE_LOG(LogTemp,
+			Warning,
+			TEXT("Client attempting toAddAction. [Class: %s]"),
+			*GetNameSafe(ActionClass));
 		return;
 	}
 

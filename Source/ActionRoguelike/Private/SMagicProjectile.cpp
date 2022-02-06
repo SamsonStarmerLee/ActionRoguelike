@@ -39,7 +39,7 @@ void ASMagicProjectile::OnActorOverlap(
 			Explode();
 
 			// Apply debuff
-			if (ActionComponent && BurningEffectClass)
+			if (ActionComponent && BurningEffectClass && HasAuthority())
 			{
 				ActionComponent->AddAction(GetInstigator(), BurningEffectClass);
 			}
