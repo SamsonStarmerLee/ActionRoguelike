@@ -102,10 +102,13 @@ void ASCharacter::PrimaryInteract()
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
+	// Died
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
 		const auto playerController = Cast<APlayerController>(GetController());
 		DisableInput(playerController);
+
+		SetLifeSpan(5.0f);
 	}
 
 	if (Delta < 0.f)
