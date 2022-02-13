@@ -19,6 +19,12 @@ AItemChest::AItemChest()
 	SetReplicates(true);
 }
 
+void AItemChest::OnActorLoaded_Implementation()
+{
+	// Check if we were saved as open previously
+	OnRep_LidOpened();
+}
+
 void AItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
 	bLidOpened = !bLidOpened;
