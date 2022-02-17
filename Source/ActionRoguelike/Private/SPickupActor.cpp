@@ -2,6 +2,7 @@
 
 #include "SPickupActor.h"
 #include "Components/CapsuleComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ASPickupActor::ASPickupActor()
 {
@@ -15,15 +16,30 @@ ASPickupActor::ASPickupActor()
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	MeshComponent->SetupAttachment(RootComponent);
 
-	SetReplicates(true);
+	bIsActive = true;
+
+	// Only use SetReplicates() outside of constructors.
+	bReplicates = true;
+}
+
+void ASPickupActor::OnRep_IsActive()
+{
+	SetActorEnableCollision(bIsActive);
+	// Set visibility on root and all children
+	RootComponent->SetVisibility(bIsActive, true);
 }
 
 void ASPickupActor::HideAndStartCooldown()
 {
-	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	RootComponent->SetVisibility(false, true);
-
+	SetIsActiveState(false);
+	
 	GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASPickupActor::Respawn, RespawnTime);
+}
+
+void ASPickupActor::SetIsActiveState(const bool bActive)
+{
+	bIsActive = bActive;
+	OnRep_IsActive();
 }
 
 void ASPickupActor::Respawn() const
@@ -35,4 +51,11 @@ void ASPickupActor::Respawn() const
 void ASPickupActor::Interact_Implementation(APawn* InstigatorPawn)
 {
 	// Implement in derived classes
+}
+
+void ASPickupActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPickupActor, bIsActive);
 }

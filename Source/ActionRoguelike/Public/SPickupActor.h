@@ -19,6 +19,12 @@ public:
 
 protected:
 
+	UPROPERTY(ReplicatedUsing="OnRep_IsActive")
+	bool bIsActive;
+
+	UFUNCTION()
+	void OnRep_IsActive();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USceneComponent* SceneComponent;
 
@@ -35,6 +41,9 @@ protected:
 
 	UFUNCTION()
 	void HideAndStartCooldown();
+
+	UFUNCTION()
+	void SetIsActiveState(const bool bActive);
 
 	UFUNCTION()
 	void Respawn() const;
