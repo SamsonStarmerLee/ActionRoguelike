@@ -183,13 +183,13 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 
 void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
-
 	ASPlayerState* State = NewPlayer->GetPlayerState<ASPlayerState>();
 	if (State)
 	{
 		State->LoadPlayerState(CurrentSaveGame);
 	}
+
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
 
 void ASGameModeBase::KillAll()
