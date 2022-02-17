@@ -114,15 +114,6 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 	if (Delta < 0.f)
 	{
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
-
-		// Gain rage from damage taken.
-		const auto RageAmount = FMath::Abs(Delta) * RageConversionRate;
-		const auto NewRage    = FMath::Clamp(Rage + RageAmount, 0.f, MaxRage);
-		const auto RageDelta  = Rage - NewRage;
-
-		Rage = NewRage;
-		
-		OnRageChanged.Broadcast(this, Rage, RageDelta);
 	}
 }
 
@@ -154,22 +145,4 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void ASCharacter::HealSelf(const float Amount /* 100 */)
 {
 	AttributeComponent->ApplyHealthChange(this, Amount);
-}
-
-bool ASCharacter::SpendRage(const float Amount)
-{
-	if (!ensure(Amount > 0))
-	{
-		return false;
-	}
-
-	if (Rage < Amount)
-	{
-		// Not enough rage
-		return false;
-	}
-
-	Rage -= Amount;
-	OnRageChanged.Broadcast(this, Rage, Amount);
-	return true;
 }

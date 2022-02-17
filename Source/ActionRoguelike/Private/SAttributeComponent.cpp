@@ -10,7 +10,6 @@ static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("su.DamageMultiplie
 
 USAttributeComponent::USAttributeComponent()
 {
-	MaxHealth = 100;
 	Health = MaxHealth;
 
 	SetIsReplicatedByDefault(true);
@@ -21,14 +20,29 @@ void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* Instiga
 	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
 }
 
+void USAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	OnRageChanged.Broadcast(InstigatorActor, this, NewRage, Delta);
+}
+
 float USAttributeComponent::GetHealth() const
 {
 	return Health;
 }
 
+float USAttributeComponent::GetRage() const
+{
+	return Rage;
+}
+
 float USAttributeComponent::GetMaxHealth() const
 {
 	return MaxHealth;
+}
+
+float USAttributeComponent::GetMaxRage() const
+{
+	return MaxRage;
 }
 
 bool USAttributeComponent::IsFullHealth() const
@@ -52,6 +66,13 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delt
 	{
 		const float DamageModifier = CVarDamageMultiplier.GetValueOnGameThread();
 		Delta *= DamageModifier;
+
+		// Gain rage from damage taken.
+		const auto RageAmount = FMath::Abs(Delta) * RageConversionRate;
+		const auto NewRage    = FMath::Clamp(Rage + RageAmount, 0.f, MaxRage);
+		const auto RageDelta  = -(Rage - NewRage);
+		
+		ApplyRageChange(InstigatorActor, RageDelta);
 	}
 	
 	const float OldHealth = Health;
@@ -79,6 +100,21 @@ bool USAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delt
 	}
 	
 	return TrueDelta != 0;
+}
+
+bool USAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta)
+{
+	const auto OldRage = Rage;
+
+	Rage = FMath::Clamp(Rage + Delta, 0.0f, MaxRage);
+
+	const float ActualDelta = Rage - OldRage;
+	if (ActualDelta != 0.0f)
+	{
+		OnRageChanged.Broadcast(InstigatorActor, this, Rage, ActualDelta);
+	}
+
+	return ActualDelta != 0;
 }
 
 USAttributeComponent* USAttributeComponent::GetAttributes(AActor* FromActor)
@@ -112,6 +148,10 @@ void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	DOREPLIFETIME(USAttributeComponent, Health);
 	DOREPLIFETIME(USAttributeComponent, MaxHealth);
+
+	DOREPLIFETIME(USAttributeComponent, Rage);
+	DOREPLIFETIME(USAttributeComponent, MaxRage);
+	DOREPLIFETIME(USAttributeComponent, RageConversionRate);
 
 	// DOREPLIFETIME_CONDITION(USAttributeComponent, MaxHealth, COND_OwnerOnly);
 }

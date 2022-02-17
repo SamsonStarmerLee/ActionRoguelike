@@ -11,14 +11,7 @@ class USAttributeComponent;
 class USInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
-
 class ASCharacter;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
-	FOnRageChanged,
-	ASCharacter*, PlayerCharacter,
-	float, NewRage,
-	float, Delta);
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -47,18 +40,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Actions")
 	USActionComponent* ActionComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rage")
-	float Rage;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rage")
-	float MaxRage = 100.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rage", meta = (ClampMin=0.f, ClampMax=1.f))
-	float RageConversionRate = 0.1f;
-
-	UPROPERTY(BlueprintAssignable, Category = "Rage")
-	FOnRageChanged OnRageChanged;
 	
 	void MoveForward(float Value);
 
@@ -94,7 +75,4 @@ public:
 
 	UFUNCTION(Exec)
 	void HealSelf(float Amount = 100);
-
-	UFUNCTION(BlueprintCallable)
-	bool SpendRage(float Amount);
 };

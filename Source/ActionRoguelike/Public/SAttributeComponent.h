@@ -15,6 +15,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
 	float, NewHealth,
 	float, Delta);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(
+	FOnRageChanged,
+	AActor*, InstigatorActor,
+	USAttributeComponent*, OwningComp,
+	float, NewRage,
+	float, Delta);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ACTIONROGUELIKE_API USAttributeComponent : public UActorComponent
 {
@@ -36,10 +43,22 @@ protected:
 	float Health;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
-	float MaxHealth;
+	float MaxHealth = 100.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rage")
+	float Rage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rage")
+	float MaxRage = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rage", meta = (ClampMin=0.f, ClampMax=1.f))
+	float RageConversionRate = 0.1f;
 
 	UFUNCTION(NetMulticast, Reliable) // @FIXME: Mark as unreliable once we've moved the state of our schracter
 	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRageChanged(AActor* InstigatorActor, float NewRage, float Delta);
 	
 public:
 
@@ -47,7 +66,13 @@ public:
 	float GetHealth() const;
 
 	UFUNCTION(BlueprintCallable)
+	float GetRage() const;
+
+	UFUNCTION(BlueprintCallable)
 	float GetMaxHealth() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetMaxRage() const;
 
 	UFUNCTION(BlueprintCallable)
 	bool IsFullHealth() const;
@@ -57,9 +82,15 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
 	FOnHealthChanged OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Attributes")
+	FOnRageChanged OnRageChanged;
 	
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = "Attributes")
+	bool ApplyRageChange(AActor* InstigatorActor, float Delta);
 
 	UFUNCTION(BlueprintCallable)
 	bool Kill(AActor* InstigatorActor);
