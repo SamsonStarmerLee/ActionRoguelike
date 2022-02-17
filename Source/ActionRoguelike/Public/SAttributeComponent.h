@@ -45,13 +45,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float MaxHealth = 100.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Rage")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "Rage")
 	float Rage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Rage")
 	float MaxRage = 100.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Rage", meta = (ClampMin=0.f, ClampMax=1.f))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Rage", meta = (ClampMin=0.f, ClampMax=1.f))
 	float RageConversionRate = 0.1f;
 
 	UFUNCTION(NetMulticast, Reliable) // @FIXME: Mark as unreliable once we've moved the state of our schracter
