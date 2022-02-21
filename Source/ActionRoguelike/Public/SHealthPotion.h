@@ -23,4 +23,6 @@ protected:
 
 public:	
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
+
+	virtual FText GetInteractText_Implementation(APawn* InstigatorPawn) override;
 };

@@ -5,6 +5,8 @@
 #include "SCharacter.h"
 #include "SPlayerState.h"
 
+#define LOCTEXT_NAMESPACE "InteractableActors"
+
 void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
 	if (!ensure(InstigatorPawn))
@@ -30,7 +32,7 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		return;
 	}
 
-	if (!Attributes->IsFullHealth())
+	if (Attributes->IsFullHealth())
 	{
 		// Full health, can't heal
 		return;
@@ -45,3 +47,20 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	// Go on cooldown
 	HideAndStartCooldown();
 }
+
+FText ASHealthPotion::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	USAttributeComponent* AttributeComponent = USAttributeComponent::GetAttributes(InstigatorPawn);
+	if (AttributeComponent && AttributeComponent->IsFullHealth())
+	{
+		return LOCTEXT("HealthPotion_FullHealthWarning", "Already at full health.");
+	}
+	
+	return FText::Format(
+		LOCTEXT(
+			"HealthPotion_InteractMessage",
+			"Costs {0} Credits. Restores health to maximum."),
+		Cost); 
+}
+
+#undef LOCTEXT_NAMESPACE

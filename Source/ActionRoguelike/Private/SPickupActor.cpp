@@ -53,6 +53,12 @@ void ASPickupActor::Interact_Implementation(APawn* InstigatorPawn)
 	// Implement in derived classes
 }
 
+FText ASPickupActor::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	// Implement in derived classes
+	return FText::GetEmpty();
+}
+
 void ASPickupActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
