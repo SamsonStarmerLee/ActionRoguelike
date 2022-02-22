@@ -1,14 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SGameModeBase.h"
-
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
+#include "SActionComponent.h"
 #include "SAttributeComponent.h"
 #include "SCharacter.h"
 #include "SGameplayInterface.h"
+#include "SMonsterData.h"
 #include "SPlayerState.h"
+#include "ActionRoguelike/ActionRoguelike.h"
 #include "AI/SAICharacter.h"
+#include "Engine/AssetManager.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameFramework/GameStateBase.h"
@@ -94,7 +97,55 @@ void ASGameModeBase::OnSpawnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper*
 	TArray<FVector> Locations;
 	if (QueryInstance->GetQueryResultsAsLocations(Locations) && Locations.Num() > 0)
 	{
-		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
+		if (MonsterTable)
+		{
+			TArray<FMonsterInfoRow*> Rows;
+			MonsterTable->GetAllRows("", Rows);
+
+			// Get Random Enemy
+			const int32 RandomIndex = FMath::RandRange(0, Rows.Num() - 1);
+			const FMonsterInfoRow* SelectedRow = Rows[RandomIndex];
+
+			UAssetManager* Manager = UAssetManager::GetIfValid();
+			if (Manager)
+			{
+				const TArray<FName> Bundles;
+				const FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(
+					this,
+					&ASGameModeBase::OnMonsterLoaded,
+					SelectedRow->MonsterID,
+					Locations);
+				
+				Manager->LoadPrimaryAsset(SelectedRow->MonsterID, Bundles, Delegate);
+			}
+		}
+	}
+}
+
+void ASGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedId, TArray<FVector> SpawnLocation)
+{
+	UAssetManager* Manager = UAssetManager::GetIfValid();
+	if (Manager)
+	{
+		USMonsterData* MonsterData = Cast<USMonsterData>(Manager->GetPrimaryAssetObject(LoadedId));
+		if (MonsterData)
+		{
+			AActor* NewBot = GetWorld()->SpawnActor<AActor>(MonsterData->MonsterClass, SpawnLocation[0], FRotator::ZeroRotator);
+			if (NewBot)
+			{
+				LogOnScreen(this, FString::Printf(
+					TEXT("Spawned Enemy: %s (%s)"), *GetNameSafe(NewBot), *GetNameSafe(MonsterData)));
+	
+				USActionComponent* ActionComponent = NewBot->FindComponentByClass<USActionComponent>();
+				if (ActionComponent)
+				{
+					for (const auto Action : MonsterData->Actions)
+					{
+						ActionComponent->AddAction(NewBot, Action);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -130,7 +181,7 @@ void ASGameModeBase::OnSpawnCoinQueryCompleted(UEnvQueryInstanceBlueprintWrapper
 		bool bValidLocation = true;
 		for (FVector OtherLocation : UsedLocations)
 		{
-			float DistanceTo = (SelectedLocation - OtherLocation).Size();
+			const float DistanceTo = (SelectedLocation - OtherLocation).Size();
 
 			if (DistanceTo < RequiredPowerupSeparation)
 			{
