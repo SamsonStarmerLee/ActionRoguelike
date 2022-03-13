@@ -11,7 +11,7 @@
 UCLASS(
 	Config=Game,
 	defaultconfig,
-	meta = (DisplayName="Save Game Settings")) 
+	meta = (DisplayName="Save Game Settings")) // This will appear as a category in project settings
 class ACTIONROGUELIKE_API USSaveGameSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
