@@ -12,7 +12,7 @@ int32 ASPlayerState::GetCredits() const
 
 void ASPlayerState::AddCredits(const int32 Amount)
 {
-	if (!ensure(Amount > 0))
+	if (Amount <= 0)
 	{
 		return;
 	}
