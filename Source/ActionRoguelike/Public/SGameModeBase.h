@@ -1,9 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-
 #include "CoreMinimal.h"
-#include "SSaveGame.h"
 #include "Engine/DataTable.h"
 #include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "GameFramework/GameModeBase.h"
@@ -53,12 +51,7 @@ public:
 
 protected:
 
-	FString SlotName = "SaveGame01";
-
 	FTimerHandle TimerHandle_SpawnBots;
-
-	UPROPERTY()
-	USSaveGame* CurrentSaveGame;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UDataTable* MonsterTable;
@@ -109,9 +102,4 @@ public:
 
 	UFUNCTION(Exec)
 	void KillAll();
-
-	UFUNCTION(BlueprintCallable, Category = "SaveGame")
-	void WriteSaveGame();
-
-	void LoadSaveGame();
 };

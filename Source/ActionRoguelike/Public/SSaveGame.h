@@ -11,9 +11,8 @@ struct FActorSaveData
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY()
-	FString ActorName;
+	FName ActorName;
 
 	UPROPERTY()
 	FTransform Transform;
@@ -22,6 +21,30 @@ public:
 	TArray<uint8> ByteData; 
 };
 
+USTRUCT()
+struct FPlayerSaveData
+{
+	GENERATED_BODY()
+
+	/* Player Id defined by the online sub system (such as Steam) converted to FString for simplicity  */ 
+	UPROPERTY()
+	FString PlayerID;
+
+	UPROPERTY()
+	int32 Credits;
+
+	/* Location if player was alive during save */
+	UPROPERTY()
+	FVector Location;
+
+	/* Orientation if player was alive during save */ 
+	UPROPERTY()
+	FRotator Rotation;
+
+	/* We don't always want to restore location, and may just resume player at specific respawn point in world. */
+	UPROPERTY()
+	bool bResumeAtTransform;
+};
 
 UCLASS()
 class ACTIONROGUELIKE_API USSaveGame : public USaveGame
@@ -31,8 +54,10 @@ class ACTIONROGUELIKE_API USSaveGame : public USaveGame
 public:
 
 	UPROPERTY()
-	int32 Credits;
+	TArray<FPlayerSaveData> SavedPlayers;
 
 	UPROPERTY()
 	TArray<FActorSaveData> SavedActors;
+
+	FPlayerSaveData* GetPlayerData(APlayerState* PlayerState);
 };

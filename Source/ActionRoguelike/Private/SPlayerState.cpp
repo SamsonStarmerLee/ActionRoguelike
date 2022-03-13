@@ -2,6 +2,7 @@
 
 #include "SPlayerState.h"
 
+#include "SSaveGame.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -51,7 +52,20 @@ void ASPlayerState::SavePlayerState_Implementation(USSaveGame* SaveObject)
 {
 	if (SaveObject)
 	{
-		SaveObject->Credits = Credits;
+		// Gather all relevant player data
+		FPlayerSaveData SaveData;
+		SaveData.Credits = Credits;
+		SaveData.PlayerID = GetUniqueId().ToString();
+
+		// May not be alive when we save
+		if (const APawn* Pawn = GetPawn())
+		{
+			SaveData.Location = Pawn->GetActorLocation();
+			SaveData.Rotation = Pawn->GetActorRotation();
+			SaveData.bResumeAtTransform = true;
+		}
+
+		SaveObject->SavedPlayers.Add(SaveData);
 	}
 }
 
@@ -59,7 +73,15 @@ void ASPlayerState::LoadPlayerState_Implementation(USSaveGame* SaveObject)
 {
 	if (SaveObject)
 	{
-		AddCredits(SaveObject->Credits);
+		FPlayerSaveData* FoundData = SaveObject->GetPlayerData(this);
+		if (FoundData)
+		{
+			AddCredits(FoundData->Credits);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Could not find SaveGame data for player id '%i'."), GetPlayerId());
+		}
 	}
 }
 
