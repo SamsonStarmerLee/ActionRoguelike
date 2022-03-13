@@ -16,7 +16,7 @@ AItemChest::AItemChest()
 
 	TargetPitch = 110;
 
-	SetReplicates(true);
+	bReplicates = true;
 }
 
 void AItemChest::OnActorLoaded_Implementation()
